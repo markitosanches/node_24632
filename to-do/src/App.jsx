@@ -1,7 +1,11 @@
 import Header from './components/Header'
 import AddTask from './components/AddTask'
 import ManyTasks from './components/ManyTasks'
+import Footer from './components/Footer'
+import About from './components/About'
+import Task from './components/Task'
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 function App() {
     const [tasks, setTasks] = useState([])
@@ -29,9 +33,20 @@ function App() {
         })
       setTasks(tasks.filter((task)=>task.id !== id))
     }
-    const toggleReminder = (id) => {
+    const toggleReminder =  async (id) => {
         // alert(id)
-        setTasks(tasks.map((task) => task.id === id ? { ...task, reminder:!task.reminder} :  task ))
+        const taskToToggle = await fetchTasks(`http://localhost:5000/tasks/${id}`)
+        const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder}
+        const res = await fetch(`http://localhost:5000/tasks/${id}`,{
+          method: 'PUT',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify(updTask)
+        })
+        const data = await res.json()
+
+        setTasks(tasks.map((task) => task.id === id ? { ...task, reminder:data.reminder} :  task ))
     }
     const addTask = async (task) => {
       const res = await fetch('http://localhost:5000/tasks', {
@@ -52,13 +67,20 @@ function App() {
     
     const [showAddTask, setShowAddTask] = useState(false)
   return(
-    <div className="font-sans min-h-screen">
-      <div className="container mx-auto p-8 border-2 border-blue-200 mt-16 max-w-screen-md rounded" >
-        <Header toggleForm={() => setShowAddTask(!showAddTask)} showAdd={showAddTask}/>
-        { showAddTask && <AddTask onAdd={addTask}/>}
-        <ManyTasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder}/>
+    <BrowserRouter>
+      <div className="font-sans min-h-screen">
+        <div className="container mx-auto p-8 border-2 border-blue-200 mt-16 max-w-screen-md rounded" >
+          <Header toggleForm={() => setShowAddTask(!showAddTask)} showAdd={showAddTask}/>
+          { showAddTask && <AddTask onAdd={addTask}/>}
+          <Routes>
+            <Route path='/' element={<ManyTasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder}/>} /> 
+            <Route path='/task/:id' element={<Task setShowAddTask={setShowAddTask}/>}/>
+            <Route path='/about' element={<About setShowAddTask={setShowAddTask}/>}/>
+          </Routes>
+          <Footer/>
+        </div>
       </div>
-    </div>
+    </BrowserRouter>
   )
 }
 
