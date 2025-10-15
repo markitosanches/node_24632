@@ -20,30 +20,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="my-2">
-                            <td><img src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg" alt="..." class="max-w-[100px] max-h-[100px] my-2" /></td>
-                            <td>Gift Bag</td>
-                            <td>$99.00</td>
-                            <td class="text-center">1</td>
-                            <td>$99.00</td>
+                        <tr v-for="(quantity, key, i) in cart" class="my-2">
+                            <td><img :src="getPhoto(key)" :alt="key" class="max-w-[100px] max-h-[100px] my-2" /></td>
+                            <td>{{ key }}</td>
+                            <td>${{ getPrice(key) }}</td>
+                            <td class="text-center">{{ quantity }}</td>
+                            <td>${{ (getPrice(key)*quantity).toFixed(2)}}</td>
                             <td class="text-center">
                                 <button class="text-red-600 px-7 text-lg font-bold">
                                     &times;
                                 </button>
                             </td>
                         </tr>
-                        <tr class="my-2">
-                            <td><img src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg" alt="..." class="max-w-[100px] max-h-[100px] my-2" /></td>
-                            <td>Sport Sneakers</td>
-                            <td>$599.00</td>
-                            <td class="text-center">1</td>
-                            <td>$599.00</td>
-                            <td class="text-center">
-                                <button class="text-red-600 px-7 text-lg font-bold">
-                                    &times;
-                                </button>
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
                 <p class="text-center"><em>No items in cart</em></p>
@@ -58,6 +47,20 @@
 
 <script>
 export default {
-    props:['toggle']
+    props:['toggle', 'cart', 'inventory'],
+    methods: {
+        getPrice (name) {
+            const product = this.inventory.find((p) => {
+                return p.name === name
+            })
+            return product.price.toFixed(2)
+        },
+        getPhoto (name) {
+            const product = this.inventory.find((p) => {
+                return p.name === name
+            })
+            return product.photo
+        }
+    }
 }
 </script>

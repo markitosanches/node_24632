@@ -28,10 +28,13 @@
     </nav>
     <router-view
     :inventory="inventory"
+    :add="addToCart"
     />
     <SideBar 
     v-if="showSideBar"
-    :toggle="toggleSideBar"/>
+    :toggle="toggleSideBar"
+    :cart="cart"
+    :inventory="inventory"/>
     <Footer/>
   </div>
 </template>
@@ -49,13 +52,18 @@ export default {
   data () {
     return {
       showSideBar: false,
-      inventory: product
+      inventory: product,
+      cart: {}
     }
   },
 methods: {
-  toggleSideBar () {
-    this.showSideBar = !this.showSideBar
+    toggleSideBar () {
+      this.showSideBar = !this.showSideBar
+    },
+    addToCart(product, index){
+      if (!this.cart[product]) this.cart[product] = 0
+       this.cart[product] += this.inventory[index].quantity
+    }
   }
-}
 }
 </script>
