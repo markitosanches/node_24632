@@ -43,9 +43,20 @@
 <script>
 import SideBar from './components/SideBar.vue'
 import Footer from './components/Footer.vue'
-import product from './products.json'
+// import product from './products.json'
+import ProductDataService from './services/ProductDataService'
 
 export default {
+  mounted () {
+    ProductDataService.getAll()
+        .then(response => {
+        this.inventory = response.data
+        // console.log(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error)
+      })
+  },
   components: {
     SideBar,
     Footer
@@ -53,7 +64,7 @@ export default {
   data () {
     return {
       showSideBar: false,
-      inventory: product,
+      inventory: [],
       cart: {}
     }
   },
