@@ -7,23 +7,23 @@
         <form>
           <div class="mb-4">
             <label for="productName" class="block text-sm font-medium text-gray-700">Product Name</label>
-            <input type="text" id="productName" class="mt-1 p-2 border w-full rounded-md" required />
+            <input v-model="product.name" type="text" id="productName" class="mt-1 p-2 border w-full rounded-md" required />
           </div>
           <div class="mb-4">
             <label for="productPhoto" class="block text-sm font-medium text-gray-700">Product Photo</label>
-            <input type="text" id="productPhoto" class="mt-1 p-2 border w-full rounded-md" required />
+            <input v-model="product.photo" type="text" id="productPhoto" class="mt-1 p-2 border w-full rounded-md" required />
           </div>
           <div class="mb-4">
             <label for="productPrice" class="block text-sm font-medium text-gray-700">Price (CAD)</label>
-            <input type="text" id="productPrice" class="mt-1 p-2 border w-full rounded-md" required />
+            <input v-model="product.price" type="text" id="productPrice" class="mt-1 p-2 border w-full rounded-md" required />
           </div>
           <div class="mb-4">
             <label for="productDescription" class="block text-sm font-medium text-gray-700">Product Description</label>
-            <textarea id="productDescription" class="mt-1 p-2 border w-full rounded-md" required></textarea>
+            <textarea v-model="product.description" id="productDescription" class="mt-1 p-2 border w-full rounded-md" required></textarea>
           </div>
           <div class="mb-4">
             <label for="productType" class="block text-sm font-medium text-gray-700">Product Type</label>
-            <select id="productType" class="mt-1 p-2 border w-full rounded-md" required>
+            <select  v-model="product.type" id="productType" class="mt-1 p-2 border w-full rounded-md" required>
               <option value="">Select</option>
               <option value="Footwear">Footwear</option>
               <option value="Accessories">Accessories</option>
@@ -36,7 +36,7 @@
             </select>
           </div>
           <div class="mb-6">
-            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+            <button type="button" @click="saveProduct" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
               Save
             </button>
           </div>
@@ -51,3 +51,26 @@
     </div>
   </div>
 </template>
+
+<script>
+import ProductDataService from '../services/ProductDataService'
+
+export default {
+  data () {
+    return{
+      product: {
+        name: 'Produc 1',
+        photo: 'https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg',
+        price: '',
+        description: '',
+        type: ''
+      }
+    }
+  },
+  methods: {
+    saveProduct () {
+      ProductDataService.create(this.product)
+    }
+  }
+}
+</script>
