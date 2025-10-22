@@ -29,6 +29,8 @@
     <router-view
     :inventory="inventory"
     :add="addToCart"
+    :addInv = "addInventory"
+    :updateInv="updateInventory"
     />
     <SideBar 
     v-if="showSideBar"
@@ -79,6 +81,12 @@ methods: {
     removeItem (name) {
       // console.log(name)
       delete this.cart[name]
+    },
+    addInventory (product) {
+      this.inventory.push(product)
+    },
+    updateInventory (index, data){
+      this.inventory[index] = data
     }
   },
   computed: {

@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center border-t border-gray-100">
     <div class="border mt-2 p-6 rounded-md w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
       <div v-if="message" class="bg-red-500 mb-2 text-white p-2 rounded">{{ message }}</div>
-      <h2 class="text-2xl font-semibold mb-6">Add New Product</h2>
+      <h2 class="text-2xl font-semibold mb-6">Update Product</h2>
       <div v-if="!submitted">
         <form>
           <div class="mb-4">
@@ -36,17 +36,17 @@
             </select>
           </div>
           <div class="mb-6">
-            <button type="button" @click="saveProduct" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-              Save
+            <button type="button" @click="updateProduct" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+              Update
+            </button>
+            <button type="button"  class="w-full mt-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600">
+              Delete
             </button>
           </div>
         </form>
       </div>
       <div v-else>
-        <div class="text-green-600 font-semibold mb-4">Success Message</div>
-        <button @click="newProduct" class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600">
-          New Product
-        </button>
+        <div class="text-green-600 font-semibold mb-4">Product updated!!</div>
       </div>
     </div>
   </div>
@@ -56,43 +56,41 @@
 import ProductDataService from '../services/ProductDataService'
 
 export default {
-  props:['addInv'],
+  props:['inventory', 'updateInv'],
   data () {
     return{
       message: null,
       submitted: false,
-      product: {
-        name: '',
-        photo: 'https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg',
-        price: '',
-        description: '',
-        type: ''
-      }
+      product: {},
+      id: parseInt(this.$route.params.id)
+    }
+  },
+  mounted () {
+    ProductDataService.get(this.id)
+      .then(response => {
+        this.product = response.data
+      })
+  },
+  computed: {
+   productIndex () {
+      const index = this.inventory.findIndex((p) => {
+          return p.id === this.id
+      })
+      return index
     }
   },
   methods: {
-    saveProduct () {
-      ProductDataService.create(this.product)
+    updateProduct () {
+      ProductDataService.update(this.id ,this.product)
         .then((response) => {
          // console.log(response.data)
-          this.addInv(response.data)
+          this.updateInv(this.productIndex, this.product )
           this.message = null 
           this.submitted = true    
         })
         .catch((e)=> {
           this.message = e.response.data.message
         })
-      
-    },
-    newProduct(){
-      this.submitted = false
-      this.product = {
-        name: '',
-        photo: 'https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg',
-        price: '',
-        description: '',
-        type: ''
-      }
     }
   }
 }

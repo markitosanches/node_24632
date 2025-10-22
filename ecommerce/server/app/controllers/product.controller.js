@@ -15,5 +15,61 @@ exports.findAll = (req, res) => {
 }
 
 exports.create = (req, res) => {
-    console.log(req.body)
+
+    if(!req.body.name){
+        res.status(400).send({
+            message: 'The name is required'
+        })
+        return
+    }
+    // console.log(req.body)
+    Product.create(req.body)
+    .then(data => {
+        res.send(data)
+    })
+    .catch(err => {
+        res.status(500).send({
+        message: 'Could not insert the data'
+        })
+    })
+}
+
+exports.findOne = (req, res) => {
+    const id = req.params.id
+    Product.findByPk(id)
+    .then(data => {
+        res.send(data)
+    })
+    .catch(err => {
+        res.status(500).send({
+        message: 'Could not find the data'
+        })
+    })
+}
+
+exports.update = (req, res) => {
+    const id = req.params.id
+    Product.update(req.body, {
+        where:{id: id}
+    })
+    .then(num => {
+        if(num == 1){
+            res.send({
+                message: 'product updated'
+            })
+        }else{
+            res.status(500).send({
+                message: 'Could not find the data'
+            })
+        }
+    })
+    .catch(err => {
+        res.status(500).send({
+        message: 'Could not update the data'
+        })
+    })
+}
+
+exports.delete = (req, res) => {
+
 }
