@@ -31,6 +31,8 @@
     :add="addToCart"
     :addInv = "addInventory"
     :updateInv="updateInventory"
+    :removeInv="removeInventory"
+    :remove="removeItem"
     />
     <SideBar 
     v-if="showSideBar"
@@ -87,6 +89,9 @@ methods: {
     },
     updateInventory (index, data){
       this.inventory[index] = data
+    },
+    removeInventory (index){
+      this.inventory.splice(index, 1);
     }
   },
   computed: {

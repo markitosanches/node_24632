@@ -39,7 +39,7 @@
             <button type="button" @click="updateProduct" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
               Update
             </button>
-            <button type="button"  class="w-full mt-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600">
+            <button type="button" @click="deleteProduct" class="w-full mt-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600">
               Delete
             </button>
           </div>
@@ -56,7 +56,7 @@
 import ProductDataService from '../services/ProductDataService'
 
 export default {
-  props:['inventory', 'updateInv'],
+  props:['inventory', 'updateInv', 'removeInv', 'remove'],
   data () {
     return{
       message: null,
@@ -91,6 +91,17 @@ export default {
         .catch((e)=> {
           this.message = e.response.data.message
         })
+    },
+    deleteProduct () {
+      ProductDataService.delete(this.id)
+       .then(response => {
+        this.remove(this.product.name)
+        this.removeInv(this.productIndex)
+        this.$router.push({ name: 'home' })
+       })
+       .catch((e) => {
+        this.message = e.response.data.message
+       })
     }
   }
 }

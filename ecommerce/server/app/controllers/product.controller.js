@@ -71,5 +71,24 @@ exports.update = (req, res) => {
 }
 
 exports.delete = (req, res) => {
-
+    const id = req.params.id
+    Product.destroy({
+        where:{id: id}
+    })
+    .then(num => {
+        if(num == 1){
+            res.send({
+                message: 'product deleted'
+            })
+        }else{
+            res.status(500).send({
+                message: 'Could not find the data'
+            })
+        }
+    })
+    .catch(err => {
+        res.status(500).send({
+        message: 'Could not delete the data'
+        })
+    })
 }
