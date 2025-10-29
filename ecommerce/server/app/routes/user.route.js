@@ -8,5 +8,10 @@ module.exports = app => {
 
     router.post('/login', user.findOne)
     
+    router.get('/auth', user.auth)
+
+    router.get('/logout', user.logout)
+
+    
     app.use('/api/user', router)
 }

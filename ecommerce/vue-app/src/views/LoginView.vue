@@ -41,6 +41,8 @@ export default{
     login () {
         UserDataService.postLogin(this.user)
         .then(response => {
+          // console.log(response.data)
+            this.$store.dispatch('user', response.data.user)
             this.$router.push({ name: 'home'})
         })
         .catch(error => {

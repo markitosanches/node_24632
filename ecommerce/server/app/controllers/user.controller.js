@@ -1,6 +1,9 @@
 const db = require('../models') 
 const User = db.users
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+const https = require('http')
 
 
 exports.findAll = (req, res) => {
@@ -52,6 +55,57 @@ exports.findOne = async (req, res) => {
             message: 'Password incorrect'
         })
     }
-    console.log(user)
-    res.send('a')
+
+    console.log(user);
+
+    const token = jwt.sign({id: user.id}, 'secret')
+
+    res.cookie('jwt', token,{
+        httpOnly:true,
+        maxAge: 24 * 60 * 60 * 1000
+    })
+
+    user.update({
+        token: token
+
+    })
+    const {password, ...data} = await user.toJSON()
+    res.send({
+        user:data
+    })
+    // console.log(user)
+    // res.send('a')
+}
+
+exports.auth = async (req, res) => {
+    try{
+        const cookie = req.cookies['jwt']
+        const claims = jwt.verify(cookie, 'secret')
+
+        if(!claims){
+            return res.status(401).send({
+                message: 'unauthenticated'
+            })
+        }
+        // console.log(claims.id)
+
+        const user = await User.findOne({where:{id: claims.id}})
+        const {password, ...data} = await user.toJSON()
+        res.send({
+            user:data
+        })
+    }
+    catch (e){
+            return res.status(401).send({
+                message: 'unauthenticated 2'
+            })
+    }
+}
+
+exports.logout = async (req, res) => {
+    res.cookie('jwt', '', {maxAge:0})
+
+    res.send({
+        message: 'success'
+    })
 }

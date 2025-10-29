@@ -17,10 +17,19 @@
       <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
         <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
           <li>
-            <router-link to="/" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</router-link>
+            <router-link :to="{ name:'home' }"class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</router-link>
           </li>
-          <li>
-            <router-link to="/add-product" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Add Product</router-link>
+          <li v-if="user">
+            <router-link :to="{ name:'add-product' }" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Add Product</router-link>
+          </li>
+          <li v-if="!user">
+            <router-link :to="{ name:'user' }" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Register</router-link>
+          </li>
+          <li v-if="!user">
+            <router-link :to="{ name:'login' }" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Login</router-link>
+          </li>
+          <li v-if="user">
+            <span @click="logout" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 cursor-pointer">Logout</span>
           </li>
         </ul>
       </div>
@@ -33,6 +42,7 @@
     :updateInv="updateInventory"
     :removeInv="removeInventory"
     :remove="removeItem"
+    :user="user"
     />
     <SideBar 
     v-if="showSideBar"
@@ -49,6 +59,8 @@ import SideBar from './components/SideBar.vue'
 import Footer from './components/Footer.vue'
 // import product from './products.json'
 import ProductDataService from './services/ProductDataService'
+import UserDataService from './services/UserDataService'
+import { mapGetters } from 'vuex'
 
 export default {
   mounted () {
@@ -92,6 +104,13 @@ methods: {
     },
     removeInventory (index){
       this.inventory.splice(index, 1);
+    },
+    logout(){
+      UserDataService.getLogout()
+      .then(response => {
+        this.$store.dispatch('user', null)
+        this.$router.push('login')
+      })
     }
   },
   computed: {
@@ -99,7 +118,18 @@ methods: {
       return Object.values(this.cart).reduce((acc, curr)=> {
         return acc + curr
       }, 0)
-    }
+    },
+    ...mapGetters(['user'])
+  },
+  created () {
+    UserDataService.getAuth()
+      .then(response => {
+        this.$store.dispatch('user', response.data.user)
+      })
+      .catch(e => {
+         this.$store.dispatch('user', null)
+      })
   }
+
 }
 </script>
